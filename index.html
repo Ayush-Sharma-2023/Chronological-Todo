@@ -57,7 +57,7 @@
         <span class="text-sm text-gray-600">(Due: ${task.date})</span><br/>
         </div>
         <span class="text-sm ${isOverdue ? 'text-red-600 font-bold' : 'text-green-600'}">
-          ${isOverdue ? `${Math.abs(daysLeft)} day(s) overdue` : `${daysLeft} day(s) left`}
+          ${isOverdue ? `${Math.abs(daysLeft)} day(s) ago` : `${daysLeft} day(s) left`}
         </span>
     `;
 
