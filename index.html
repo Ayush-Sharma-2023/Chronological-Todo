@@ -31,74 +31,80 @@
     }
 
     function renderTasks() {
-      const taskList = document.getElementById("taskList");
-      taskList.innerHTML = "";
-      tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+  const taskList = document.getElementById("taskList");
+  taskList.innerHTML = "";
 
-      tasks.forEach((task, index) => {
-        const today = new Date();
-        const dueDate = new Date(task.date);
-        const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-        const isOverdue = daysLeft < 0;
+  // Sort by completion first (undone at top), then by due date
+  tasks.sort((a, b) => {
+    if (a.done !== b.done) return a.done - b.done; // incomplete first
+    return new Date(a.date) - new Date(b.date);    // then sort by date
+  });
 
-        const li = document.createElement("li");
-        li.className = "p-4 bg-gray-50 rounded shadow flex flex-col sm:flex-row sm:items-center sm:justify-between";
+  tasks.forEach((task, index) => {
+    const today = new Date();
+    const dueDate = new Date(task.date);
+    const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+    const isOverdue = daysLeft < 0;
 
-        const text = document.createElement("div");
-        text.className = "mb-2 sm:mb-0";
-        text.innerHTML = `
-          <div class="${task.done ? 'line-through text-gray-400' : ''}">
-            <span class="font-medium">${task.text}</span>
-            <span class="text-sm text-gray-600">(Due: ${task.date})</span><br/>
-            <span class="text-sm ${isOverdue ? 'text-red-600 font-bold' : 'text-green-600'}">
-              ${isOverdue ? `${Math.abs(daysLeft)} day(s) ago` : `${daysLeft} day(s) left`}
-            </span>
-          </div>
-        `;
+    const li = document.createElement("li");
+    li.className = "p-4 bg-gray-50 rounded shadow flex flex-col sm:flex-row sm:items-center sm:justify-between";
 
-        const actions = document.createElement("div");
-        actions.className = "flex gap-2";
+    const text = document.createElement("div");
+    text.className = "mb-2 sm:mb-0";
+    text.innerHTML = `
+      <div class="${task.done ? 'line-through text-gray-400' : ''}">
+        <span class="font-medium">${task.text}</span>
+        <span class="text-sm text-gray-600">(Due: ${task.date})</span><br/>
+        <span class="text-sm ${isOverdue ? 'text-red-600 font-bold' : 'text-green-600'}">
+          ${isOverdue ? `${Math.abs(daysLeft)} day(s) overdue` : `${daysLeft} day(s) left`}
+        </span>
+      </div>
+    `;
 
-        const editBtn = document.createElement("button");
-        editBtn.className = "bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500";
-        editBtn.textContent = "Edit";
-        editBtn.onclick = () => {
-          const newText = prompt("Edit Task:", task.text);
-          const newDate = prompt("Edit Date:", task.date);
-          if (newText && newDate) {
-            tasks[index] = { ...task, text: newText, date: newDate };
-            saveTasks();
-            renderTasks();
-          }
-        };
+    const actions = document.createElement("div");
+    actions.className = "flex gap-2";
 
-        const doneBtn = document.createElement("button");
-        doneBtn.className = "bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600";
-        doneBtn.textContent = "Done";
-        doneBtn.onclick = () => {
-          tasks[index].done = !tasks[index].done;
-          saveTasks();
-          renderTasks();
-        };
+    const editBtn = document.createElement("button");
+    editBtn.className = "bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500";
+    editBtn.textContent = "Edit";
+    editBtn.onclick = () => {
+      const newText = prompt("Edit Task:", task.text);
+      const newDate = prompt("Edit Date:", task.date);
+      if (newText && newDate) {
+        tasks[index] = { ...task, text: newText, date: newDate };
+        saveTasks();
+        renderTasks();
+      }
+    };
 
-        const deleteBtn = document.createElement("button");
-        deleteBtn.className = "bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600";
-        deleteBtn.textContent = "Delete";
-        deleteBtn.onclick = () => {
-          tasks.splice(index, 1);
-          saveTasks();
-          renderTasks();
-        };
+    const doneBtn = document.createElement("button");
+    doneBtn.className = "bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600";
+    doneBtn.textContent = "Done";
+    doneBtn.onclick = () => {
+      tasks[index].done = !tasks[index].done;
+      saveTasks();
+      renderTasks();
+    };
 
-        actions.appendChild(editBtn);
-        actions.appendChild(doneBtn);
-        actions.appendChild(deleteBtn);
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.onclick = () => {
+      tasks.splice(index, 1);
+      saveTasks();
+      renderTasks();
+    };
 
-        li.appendChild(text);
-        li.appendChild(actions);
-        taskList.appendChild(li);
-      });
-    }
+    actions.appendChild(editBtn);
+    actions.appendChild(doneBtn);
+    actions.appendChild(deleteBtn);
+
+    li.appendChild(text);
+    li.appendChild(actions);
+    taskList.appendChild(li);
+  });
+}
+
 
     function addTask() {
       const taskInput = document.getElementById("taskInput");
