@@ -74,7 +74,7 @@
           text.innerHTML = `
       <div class="${task.done ? "line-through text-gray-400" : ""}">
         <span class="font-medium">${task.text}</span>
-<span class="text-sm text-gray-600">(Due: ${formatDate(task.date)})</span><br/>
+<span class="text-sm text-gray-600"><br/>(Due: ${formatDate(task.date)})</span><br/>
         </div>
         <span class="text-sm ${
           isOverdue ? "text-red-600 font-bold" : "text-green-600"
