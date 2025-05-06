@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Todo List</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">Todo List</h1>
+    
+    <!-- Task Input Row -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+      <input type="text" id="taskInput" placeholder="Enter task" class="flex-1 p-3 border border-gray-300 rounded w-full"/>
+      <input type="date" id="dateInput" class="p-3 border border-gray-300 rounded w-full sm:w-auto"/>
+      <button onclick="addTask()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto">
+        Add Task
+      </button>
+    </div>
+
+    <!-- Task List Section -->
+    <ul id="taskList" class="space-y-4"></ul>
+  </div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem("todos")) || [];
+
+    function saveTasks() {
+      localStorage.setItem("todos", JSON.stringify(tasks));
+    }
+
+    function renderTasks() {
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
+      tasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      tasks.forEach((task, index) => {
+        const today = new Date();
+        const dueDate = new Date(task.date);
+        const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+        const isOverdue = daysLeft < 0;
+
+        const li = document.createElement("li");
+        li.className = "p-4 bg-gray-50 rounded shadow flex flex-col sm:flex-row sm:items-center sm:justify-between";
+
+        const text = document.createElement("div");
+        text.className = "mb-2 sm:mb-0";
+        text.innerHTML = `
+          <div class="${task.done ? 'line-through text-gray-400' : ''}">
+            <span class="font-medium">${task.text}</span>
+            <span class="text-sm text-gray-600">(Due: ${task.date})</span><br/>
+            <span class="text-sm ${isOverdue ? 'text-red-600 font-bold' : 'text-green-600'}">
+              ${isOverdue ? `${Math.abs(daysLeft)} day(s) ago` : `${daysLeft} day(s) left`}
+            </span>
+          </div>
+        `;
+
+        const actions = document.createElement("div");
+        actions.className = "flex gap-2";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500";
+        editBtn.textContent = "Edit";
+        editBtn.onclick = () => {
+          const newText = prompt("Edit Task:", task.text);
+          const newDate = prompt("Edit Date:", task.date);
+          if (newText && newDate) {
+            tasks[index] = { ...task, text: newText, date: newDate };
+            saveTasks();
+            renderTasks();
+          }
+        };
+
+        const doneBtn = document.createElement("button");
+        doneBtn.className = "bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600";
+        doneBtn.textContent = "Done";
+        doneBtn.onclick = () => {
+          tasks[index].done = !tasks[index].done;
+          saveTasks();
+          renderTasks();
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.onclick = () => {
+          tasks.splice(index, 1);
+          saveTasks();
+          renderTasks();
+        };
+
+        actions.appendChild(editBtn);
+        actions.appendChild(doneBtn);
+        actions.appendChild(deleteBtn);
+
+        li.appendChild(text);
+        li.appendChild(actions);
+        taskList.appendChild(li);
+      });
+    }
+
+    function addTask() {
+      const taskInput = document.getElementById("taskInput");
+      const dateInput = document.getElementById("dateInput");
+
+      const text = taskInput.value.trim();
+      const date = dateInput.value;
+
+      if (!text || !date) {
+        alert("Please enter both task and date.");
+        return;
+      }
+
+      tasks.push({ text, date, done: false });
+      saveTasks();
+      renderTasks();
+
+      taskInput.value = "";
+      dateInput.value = "";
+    }
+
+    renderTasks();
+  </script>
+</body>
+</html>
