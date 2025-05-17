@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Todo List</title>
-    <link rel="icon" href="checklist.png" type="image/png">
+    <link rel="icon" href="checklist.png" type="image/png" />
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-100 min-h-screen p-6">
@@ -63,7 +63,7 @@
           const today = new Date();
           const dueDate = new Date(task.date);
           const daysLeft = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-          const isOverdue = daysLeft < 0;
+          const isOverdue = daysLeft < 1;
 
           const li = document.createElement("li");
           li.className =
@@ -74,7 +74,9 @@
           text.innerHTML = `
       <div class="${task.done ? "line-through text-gray-400" : ""}">
         <span class="font-medium">${task.text}</span>
-<span class="text-sm text-gray-600"><br/>(Due: ${formatDate(task.date)})</span><br/>
+<span class="text-sm text-gray-600"><br/>(Due: ${formatDate(
+            task.date
+          )})</span><br/>
         </div>
         <span class="text-sm ${
           isOverdue ? "text-red-600 font-bold" : "text-green-600"
